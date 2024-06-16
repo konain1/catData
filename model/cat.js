@@ -1,5 +1,6 @@
 
 const mongoose = require('mongoose')
+const bcrypt = require('bcrypt')
 
 const catSchema = new mongoose.Schema({
     name:{
@@ -25,6 +26,30 @@ const catSchema = new mongoose.Schema({
     }
 })
 
+catSchema.pre('save',async function(next){
+    try {
+        if(!this.isModified(this.password)) next();
+
+        let hash = await bcrypt.hash(this.password,10)
+        this.password = hash;
+        next();
+    } catch (error) {
+        throw error
+    }
+})
+
+catSchema.pre('findOneAndUpdate', async function(next) {
+    try {
+      // Check if the password is being updated
+      if (this._update.password) {
+        const hash = await bcrypt.hash(this._update.password, 10);
+        this._update.password = hash;
+      }
+      next();
+    } catch (err) {
+      next(err);
+    }
+  });
 const catModel = mongoose.model('catModel',catSchema)
 
 module.exports = catModel

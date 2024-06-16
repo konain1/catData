@@ -1,6 +1,6 @@
 
 const express = require('express')
-
+const bcrypt = require('bcrypt')
 const route = express.Router();
 const cat  = require('../model/cat')
 
@@ -10,13 +10,15 @@ route.get('/',async(req,res)=>{
 
     let cats = await cat.find();
     let {username,password } = req.body;
-    const userCat = cats.find((cat) => cat.username === username && cat.password == password);
+    const userCat = cats.find((cat) => cat.username === username );
+    
+    const isPasswordValid = await bcrypt.compare(password, userCat.password);
 
     if(!username || !password){
         return res.json({msg:"missing username or password"})
     }
    
-    if(!userCat){
+    if(!userCat || !isPasswordValid){
         return res.json({msg:"incorrect username or password"})
     }else{
 
