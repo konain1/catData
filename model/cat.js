@@ -14,6 +14,14 @@ const catSchema = new mongoose.Schema({
     age:{
         type:Number,
         required:false
+    },
+    username:{
+        type:String,
+        required:true
+    },
+    password:{
+        type:String,
+        required:true
     }
 })
 

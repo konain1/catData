@@ -5,11 +5,27 @@ const route = express.Router();
 const cat  = require('../model/cat')
 
 
+
 route.get('/',async(req,res)=>{
 
     let cats = await cat.find();
-    res.json({msg:cats})
+    let {username,password } = req.body;
+    const userCat = cats.find((cat) => cat.username === username && cat.password == password);
+
+    if(!username || !password){
+        return res.json({msg:"missing username or password"})
+    }
+   
+    if(!userCat){
+        return res.json({msg:"incorrect username or password"})
+    }else{
+
+        res.json({msg:cats})
+    }
+
+
 })
+
 
 route.post('/create',(req,res)=>{
     let data = req.body;
