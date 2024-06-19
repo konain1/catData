@@ -3,10 +3,11 @@ const express = require('express')
 const bcrypt = require('bcrypt')
 const route = express.Router();
 const cat  = require('../model/cat')
+const {generateToken,jwtAuthmiddleware} = require('../jwt')
 
 
 
-route.get('/',async(req,res)=>{
+route.get('/',jwtAuthmiddleware,async(req,res)=>{
 
     let cats = await cat.find();
     let {username,password } = req.body;
@@ -27,13 +28,19 @@ route.get('/',async(req,res)=>{
 
 
 })
+route.get('/profile',jwtAuthmiddleware,async(req,res)=>{
+    let username = req.user;
+    let userCat = await cat.findOne({username:username});
+    res.json({userCat})
+})
 
 
 route.post('/create',(req,res)=>{
     let data = req.body;
     let catCreated = new cat(data);
+    let token = generateToken(data.username)
     catCreated.save()
-    res.status(200).json({msg:'cat has been created'})
+    res.status(200).json({msg:'cat has been created',token})
 })
 
 

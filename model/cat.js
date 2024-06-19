@@ -37,7 +37,12 @@ catSchema.pre('save',async function(next){
         throw error
     }
 })
+catSchema.methods.comparePassword = async function(condidatePassword){
 
+    let decryptedPassword = await bcrypt.compare(condidatePassword,this.password)
+
+    return decryptedPassword
+}
 catSchema.pre('findOneAndUpdate', async function(next) {
     try {
       // Check if the password is being updated
